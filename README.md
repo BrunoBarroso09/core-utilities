@@ -17,6 +17,7 @@ This component need python-dotenv library, You need to instal using this command
 
 ```bash
 pip install python-dotenv
+```
 
 ## 🛠️ How to use
 

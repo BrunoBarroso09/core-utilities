@@ -20,7 +20,7 @@ class Utilities:
     def clear_terminal() -> None:
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    @staticmethod
+    @staticmethod #Validate if the current email is valid
     def validate_email(email: str) -> bool:
         regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.search(regex, email))

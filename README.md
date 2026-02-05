@@ -11,7 +11,7 @@ This componente give a lot of essencial static methods to simplify repetitive ta
 - **get_env**: Securely read configurations via .env files.
 
 
-## ⚙️ Dependências
+## ⚙️ Dependencies
 
 This component need python-dotenv library, You need to instal using this command
 

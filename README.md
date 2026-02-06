@@ -13,7 +13,7 @@ This componente give a lot of essencial static methods to simplify repetitive ta
 
 ## ⚙️ Dependencies
 
-This component need python-dotenv library, You need to instal using this command
+This component need python-dotenv library, you need to install using this command
 
 ```bash
 pip install python-dotenv

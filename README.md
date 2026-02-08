@@ -26,6 +26,6 @@ To use this component, simply copy the `CORE-UTILITIES` folder to the root of yo
 
 ```text
 your_project/
-├── CORE-UTILITIES/
+├── UTilities/
 │   ├── __init__.py
 │   └── utilities.py

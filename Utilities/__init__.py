@@ -1,1 +1,5 @@
-from .utilities import (get_env, mask_email, mask_email, clear_terminal)
+from .utilities import Utilities
+
+mask_email = Utilities.mask_email
+validate_email = Utilities.validate_email
+get_env = Utilities.get_env

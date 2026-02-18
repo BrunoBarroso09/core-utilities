@@ -1,6 +1,6 @@
 # Core Utilities 🚀
 
-This componente give a lot of essencial static methods to simplify repetitive tasks like hide email, validate data, clear terminal and other.
+This component give a lot of essential static methods to simplify repetitive tasks like hide email, validate data, clear terminal and other.
 
 ## ✨ Functionalities
 

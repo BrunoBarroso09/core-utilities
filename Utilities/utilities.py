@@ -32,3 +32,7 @@ class Utilities:
     @staticmethod #Read systems variables or .env file
     def get_env(key: str, default: str = None) -> str:
         return os.getenv(key, default)
+
+    @staticmethod
+    def validate_fiscal_number(number: int) -> bool:
+        return ""

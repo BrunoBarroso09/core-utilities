@@ -1,5 +1,6 @@
 import os
 import re
+from os import utime
 
 from dotenv import load_dotenv
 
@@ -68,3 +69,17 @@ class Utilities:
                 return fiscal_number[-1] == Utilities._validate_digit(fiscal_number[:8])
         except ValueError:
             raise ValueError("Invalid fiscal number")
+
+    @staticmethod
+    def validate_postal_code(postal_code: str) -> bool:
+        try:
+            regex_cp = "^\\d{4}-\\d{3}?$"
+            if bool(re.match(regex_cp, postal_code)):
+                return True
+            else:
+                return False
+        except ValueError:
+            raise ValueError("Invalid postal code")
+
+n = Utilities()
+print(n.validate_postal_code("3000-20"))

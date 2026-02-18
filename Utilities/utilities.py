@@ -80,6 +80,3 @@ class Utilities:
                 return False
         except ValueError:
             raise ValueError("Invalid postal code")
-
-n = Utilities()
-print(n.validate_postal_code("3000-20"))

@@ -8,8 +8,9 @@ load_dotenv()
 
 class Utilities:
 
-    @staticmethod #Privacy: Transform email 'example@email.com' to 'e******@email.com'
+    @staticmethod
     def mask_email(email: str) -> str:
+        """Privacy: Transform email 'example@email.com' to 'e******@email.com'"""
         if not email or '@' not in email:
             return 'Invalid email'
         user, domain = email.split('@',1)
@@ -20,23 +21,27 @@ class Utilities:
 
     @staticmethod #Validate if the current email is valid
     def validate_email(email: str) -> bool:
+        """Validate if the email format is valid"""
         if not email or '@' not in email:
             return False
         regex = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
         return bool(re.fullmatch(regex, email))
 
-    @staticmethod #Transform a number into a readable currency format.
+    @staticmethod
     def format_currency(value: float, symbol: str = '€') -> str:
-        if isinstance(value, (int, float)):
+        """Transform a number into a readable currency format"""
+        if not isinstance(value, (int, float)):
             raise ValueError("Value must be a number")
         return f"{value:,.2f} {symbol}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-    @staticmethod #Read system variables .env file
+    @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
+        """Read environment variable from .env file"""
         return os.getenv(key, default)
 
     @staticmethod
     def _validate_digit(digit: str) -> str:
+        """Private method to validate control digit for Portuguese fiscal number"""
         if not digit.isdigit() or len(digit) != 8:
             raise ValueError("All characters need to be digits and length must be 8")
         sum_digit = (
@@ -49,12 +54,14 @@ class Utilities:
 
     @staticmethod
     def validate_fiscal_number(fiscal_number: str) -> bool:
+        """Validate if the Portuguese fiscal number is valid"""
         if not fiscal_number.isdigit() or len(fiscal_number) != 9:
             return False
         return fiscal_number[-1] == Utilities._validate_digit(fiscal_number[:8])
 
     @staticmethod
     def validate_postal_code(postal_code: str) -> bool:
+        """Validate if the Portuguese postal code is valid"""
         if not postal_code:
             return False
         regex_cp = r"\d{4}-\d{3}"
@@ -62,6 +69,7 @@ class Utilities:
 
     @staticmethod
     def _calculate_mod97(iban : str) -> int:
+        """Private method to calculate the mod97 for the Portuguese IBAN"""
         code = iban[:4]
         digits = iban[4:]
         replace_code = code.replace("P", str(25)).replace("T", str(29))
@@ -72,6 +80,7 @@ class Utilities:
 
     @staticmethod
     def validate_iban(iban: str) -> bool:
+        """Validate if the Portuguese IBAN is valid"""
         if not iban:
             return False
         iban = iban.replace(" ", "")
@@ -83,7 +92,3 @@ class Utilities:
         iban_valid = Utilities._calculate_mod97(iban)
 
         return iban_valid == 1
-
-
-util = Utilities()
-util.validate_iban("PT50 0002 0123 1234 5678 9015 4")

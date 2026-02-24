@@ -27,6 +27,8 @@ class Utilities:
 
     @staticmethod #Transform a number into a readable currency format.
     def format_currency(value: float, symbol: str = '€') -> str:
+        if isinstance(value, (int, float)):
+            raise ValueError("Value must be a number")
         return f"{value:,.2f} {symbol}".replace(",", "X").replace(".", ",").replace("X", ".")
 
     @staticmethod #Read system variables .env file

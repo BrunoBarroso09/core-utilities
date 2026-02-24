@@ -6,6 +6,9 @@ __pycache__/
 __pycache__/
 *.pyc
 
+# PyCharm / IntelliJ
+.idea/
+
 ./idea
 # C extensions
 *.so

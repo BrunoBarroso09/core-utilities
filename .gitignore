@@ -3,11 +3,21 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.env
+dist/
+build/
+*.egg-info/
 
 # PyCharm / IntelliJ
 .idea/
+
+# macOS
+.DS_Store
 
 ./idea
 # C extensions

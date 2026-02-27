@@ -10,12 +10,19 @@ class Utilities:
 
     @staticmethod
     def mask_email(email: str) -> str:
-        """Privacy: Transform email 'example@email.com' to 'e******@email.com'"""
-        if not email or '@' not in email:
-            return 'Invalid email'
+        """
+        Masks an email address for GDPR compliance.
+
+        Args:
+            email: The email address to mask.
+        Returns:
+            The masked email address.
+        Raises:
+            ValueError: If the email format is invalid.
+        """
+        if not email or '@' not in email or '.' not in email.split('@')[-1]:
+            raise ValueError("Invalid email")
         user, domain = email.split('@', 1)
-        if '.' not in domain:
-            return 'Invalid email'
         domain, tld = domain.split('.', 1)
         masked_user = user[0] + '*' * len(user[1:])
         masked_domain = domain[0] + '*' * len(domain[1:])
@@ -23,7 +30,14 @@ class Utilities:
 
     @staticmethod
     def validate_email(email: str) -> bool:
-        """Validate if the email format is valid"""
+        """
+        Validate if the email format is valid
+        
+        Args:
+            email: The email address to validate.
+        Returns:
+            True if the email format is valid, False otherwise.
+        """
         if not email or '@' not in email:
             return False
         regex = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
@@ -31,19 +45,46 @@ class Utilities:
 
     @staticmethod
     def format_currency(value: float, symbol: str = '€') -> str:
-        """Transform a number into a readable currency format"""
+        """
+        Transform a number into a readable currency format
+
+        Args:
+            value: The value to format.
+            symbol: The symbol to use.
+        Returns:
+            The formatted value.
+        Raises:
+            ValueError: If the value is not valid.
+        """
         if not isinstance(value, (int, float)):
             raise ValueError("Value must be a number")
         return f"{value:,.2f} {symbol}".replace(",", "X").replace(".", ",").replace("X", ".")
 
     @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
-        """Read environment variable from .env file"""
+        """
+        Read environment variable from .env file
+
+        Args:
+            key: Environment variable to read.
+            default: Default value to return if key is not found.
+        Returns:
+            Environment variable value.
+        """
         return os.getenv(key, default)
 
     @staticmethod
     def _validate_digit(digit: str) -> str:
-        """Private method to validate control digit for Portuguese fiscal number"""
+        """
+        Private method to validate control digit for Portuguese fiscal number
+
+        Args:
+            digit: The control digit to validate.
+        Returns:
+            The validated control digit.
+        Raises:
+            ValueError: If the control digit is not valid.
+        """
         if not digit.isdigit() or len(digit) != 8:
             raise ValueError("All characters need to be digits and length must be 8")
         sum_digit = (
@@ -56,33 +97,59 @@ class Utilities:
 
     @staticmethod
     def validate_fiscal_number(fiscal_number: str) -> bool:
-        """Validate if the Portuguese fiscal number is valid"""
+        """
+        Validate if the Portuguese fiscal number is valid
+
+        Args:
+            fiscal_number: The fiscal number to validate.
+        Returns:
+            True if the fiscal number is valid, False otherwise.
+        """
         if not fiscal_number.isdigit() or len(fiscal_number) != 9:
             return False
         return fiscal_number[-1] == Utilities._validate_digit(fiscal_number[:8])
 
     @staticmethod
     def validate_postal_code(postal_code: str) -> bool:
-        """Validate if the Portuguese postal code is valid"""
+        """
+        Validate if the Portuguese postal code is valid
+
+        Args:
+            postal_code: The postal code to validate.
+        Returns:
+            True if the postal code is valid, False otherwise.
+        """
         if not postal_code:
             return False
         regex_cp = r"\d{4}-\d{3}"
         return bool(re.fullmatch(regex_cp, postal_code))
 
     @staticmethod
-    def _calculate_mod97(iban : str) -> int:
-        """Private method to calculate the mod97 for the Portuguese IBAN"""
+    def _calculate_mod97(iban: str) -> int:
+        """
+        Private method to calculate the mod97 for the Portuguese IBAN.
+
+        Args:
+            iban: The IBAN to calculate the mod97 for.
+        Returns:
+            The mod97 calculated for the IBAN.
+        """
         code = iban[:4]
         digits = iban[4:]
-        replace_code = code.replace("P", str(25)).replace("T", str(29))
+        replace_code = code.replace("P", "25").replace("T", "29")
         iban_formatted = digits + replace_code
-        number = int(iban_formatted)
-        result = number % 97
-        return result
+        return int(iban_formatted) % 97
 
     @staticmethod
     def validate_iban(iban: str) -> bool:
-        """Validate if the Portuguese IBAN is valid"""
+        """
+        Validate if the Portuguese IBAN is valid
+
+        Args:
+            iban: The IBAN to validate.
+        Returns:
+            True if the IBAN is valid, False otherwise.
+        """
         if not iban:
             return False
         iban = iban.replace(" ", "")
@@ -91,6 +158,32 @@ class Utilities:
         if not iban[2:].isdigit():
             return False
 
-        iban_valid = Utilities._calculate_mod97(iban)
+        return Utilities._calculate_mod97(iban) == 1
 
-        return iban_valid == 1
+# TODO: Validações Portuguesas
+#  validate_phone_number — valida telemóvel português (9x, 2x)
+#  validate_cc — valida Cartão de Cidadão
+#  validate_niss — valida Número de Segurança Social
+#  validate_license_plate — valida matrícula portuguesa (AA-00-AA)
+
+# TODO: RGPD / Privacidade
+#  mask_phone — 912345678 → 9*******8
+#  mask_iban — PT50... → PT50 **** **** ****
+#  mask_cc — mascara número do Cartão de Cidadão
+#  mask_fiscal_number — 229007813 → 2*******3
+
+# TODO: Formatações Portuguesas
+#  format_phone_number — 912345678 → +351 912 345 678
+#  format_fiscal_number — 229007813 → 229 007 813
+#  format_postal_code — 1000001 → 1000-001
+#  format_iban — PT50000201231234567890154 → PT50 0002 0123 1234 5678 9015 4
+
+# TODO: Datas
+#  validate_date — valida se uma data é válida
+#  format_date_pt — 2026-02-24 → 24/02/2026
+#  is_working_day — verifica se um dia é útil em Portugal (excluindo feriados)
+
+# TODO: Strings
+#  normalize_text — remove acentos (ção → cao)
+#  truncate_string — corta string com limite de caracteres
+#  sanitize_string — remove caracteres especiais

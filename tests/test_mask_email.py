@@ -1,4 +1,5 @@
 from Utilities import Utilities
+import pytest
 
 def test_mask_email_is_string():
     result = Utilities.mask_email("example@gmail.com")
@@ -9,12 +10,12 @@ def test_mask_email_valid():
     assert result == "e******@g****.com"
 
 def test_mask_email_invalid():
-    result = Utilities.mask_email("example@gm")
-    assert result == "Invalid email"
+    with pytest.raises(ValueError):
+        Utilities.mask_email("example@gm")
 
 def test_mask_email_empty():
-    result = Utilities.mask_email("")
-    assert result == "Invalid email"
+    with pytest.raises(ValueError):
+        Utilities.mask_email("")
 
 def test_mask_email_subdomain():
     result = Utilities.mask_email("example@company.co.uk")

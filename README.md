@@ -11,6 +11,7 @@ This component provides essential static methods to simplify repetitive tasks li
 - **validate_fiscal_number**: Validates the Portuguese taxpayer identification number according to Portuguese standards.
 - **validate_postal_code**: Validates the format of the Portuguese postal code using regular expressions (Regex).
 - **validate_iban**: Validates a Portuguese IBAN (format and MOD 97 check)
+- **get_city_by_telephone**: Returns the city associated with the telephone prefix
 
 ## 🛠️ How to use
 
@@ -32,8 +33,10 @@ print(Utilities.validate_fiscal_number("287148300"))    # return True
 
 # Validate Portuguese postal code
 print(Utilities.validate_postal_code("1231-323"))   # return True
-```
 
+# Get city by telephone prefix
+print(Utilities.get_city_by_telephone("217676778")) # return Lisboa
+```
 
 ## 🧪 Running Tests
 
@@ -49,15 +52,16 @@ pytest tests/
 
 Expected output:
 ```
-tests/test_env.py .....                                                                                                                                                                                                          [ 16%]
-tests/test_format_currency.py ....                                                                                                                                                                                              [ 30%]
-tests/test_mask_email.py .....                                                                                                                                                                                                   [ 46%]
-tests/test_validate_email.py ....                                                                                                                                                                                                [ 60%]
-tests/test_validate_fiscal_number.py ....                                                                                                                                                                                        [ 73%]
-tests/test_validate_iban.py ....                                                                                                                                                                                                 [ 86%]
+tests/test_env.py .....                                                                                                                                                                                                          [ 13%]
+tests/test_format_currency.py ....                                                                                                                                                                                               [ 25%]
+tests/test_get_city_by_telephone.py ......                                                                                                                                                                                       [ 41%]
+tests/test_mask_email.py .....                                                                                                                                                                                                   [ 55%]
+tests/test_validate_email.py ....                                                                                                                                                                                                [ 66%]
+tests/test_validate_fiscal_number.py ....                                                                                                                                                                                        [ 77%]
+tests/test_validate_iban.py ....                                                                                                                                                                                                 [ 88%]
 tests/test_validate_postal_code.py ....                                                                                                                                                                                          [100%]
 
-========================================================================================================== 30 passed in 0.03s ==========================================================================================================
+========================================================================================================== 36 passed in 0.06s ==========================================================================================================
 ```
 
 ### Test coverage
@@ -71,6 +75,7 @@ tests/test_validate_postal_code.py ....                                         
 | `test_validate_fiscal_number` | Validate if the Portuguese fiscal number is valid |
 | `test_validate_iban` | Validate if the Portuguese IBAN is valid |
 | `test_validate_postal_code` | Validate if the Portuguese postal code is valid |
+| `test_get_city_by_telephone` | Returns the city associated with the telephone prefix |
 
 ## 📁 Project Structure
 ```text
@@ -86,7 +91,8 @@ core-utilities/
 │   ├── test_validate_email.py
 │   ├── test_validate_fiscal_number.py
 │   ├── test_validate_iban.py
-│   └── test_validate_postal_code.py
+│   ├── test_validate_postal_code.py
+│   └── test_get_city_by_telephone.py
 ├── README.md
 └── LICENSE
 ```

@@ -159,3 +159,142 @@ class Utilities:
             return False
 
         return Utilities._calculate_mod97(iban) == 1
+
+    @staticmethod
+    def _get_city_by_indicative(indicative: int) -> str:
+        """
+        Return the city based on the indicative value.
+
+        Args:
+            indicative: The indicative value to get the city for.
+        Returns:
+            Return the city based on the indicative value.
+        Raises:
+            ValueError: If the indicative value is not valid.
+        """
+        match indicative:
+            case 241:
+                return "Abrantes"
+            case 235:
+                return "Arganil"
+            case 234:
+                return "Aveiro"
+            case 284:
+                return "Beja"
+            case 253:
+                return "Braga"
+            case 273:
+                return "Bragança"
+            case 262:
+                return "Caldas da Rainha"
+            case 272:
+                return "Castelo Branco"
+            case 286:
+                return "Castro Verde"
+            case 276:
+                return "Chaves"
+            case 239:
+                return "Coimbra"
+            case 275:
+                return "Covilhã"
+            case 268:
+                return "Estremoz"
+            case 266:
+                return "Évora"
+            case 289:
+                return "Faro"
+            case 233:
+                return "Figueira da Foz"
+            case 271:
+                return "Guarda"
+            case 277:
+                return "Idanha-a-nova"
+            case 244:
+                return "Leiria"
+            case 21:
+                return "Lisboa"
+            case 231:
+                return "Mealhada"
+            case 278:
+                return "Mirandela"
+            case 279:
+                return "Moncorvo"
+            case 285:
+                return "Moura"
+            case 283:
+                return "Odemira"
+            case 255:
+                return "Penafiel"
+            case 254:
+                return "Peso da Régua"
+            case 236:
+                return "Pombal"
+            case 242:
+                return "Ponte de Sôr"
+            case 245:
+                return "Portalegre"
+            case 282:
+                return "Portimão"
+            case 22:
+                return "Porto"
+            case 274:
+                return "Proença-a-nova"
+            case 243:
+                return "Santarém"
+            case 269:
+                return "Santiago do Cacém"
+            case 256:
+                return "São João da Madeira"
+            case 238:
+                return "Seia"
+            case 265:
+                return "Setúbal"
+            case 281:
+                return "Tavira"
+            case 249:
+                return "Torres Novas"
+            case 261:
+                return "Torres Vedras"
+            case 251:
+                return "Valença"
+            case 258:
+                return "Viana do Castelo"
+            case 263:
+                return "Vila Franca de Xira"
+            case 252:
+                return "Vila Nova de Famalicão"
+            case 259:
+                return "Vila Real"
+            case 232:
+                return "Viseu"
+            case 291:
+                return "Funchal / Porto santo"
+            case 295:
+                return "Angra do Heroísmo / Graciosa / São Jorge"
+            case 292:
+                return "Corvo / Faial / Flores / Horta / Pico"
+            case 296:
+                return "Ponta Delgada / São Miguel / Santa Maria"
+            case _:
+                raise ValueError("Invalid indicative")
+
+    @staticmethod
+    def get_city_by_telephone(telephone: str) -> str:
+        """
+        Returns the city associated with the telephone prefix
+
+        Args:
+            telephone (str): Telephone number
+        Returns:
+            str: City associated with prefix
+        Raises:
+            ValueError: Invalid telephone number
+        """
+        if not telephone:
+            raise ValueError("Invalid telephone number")
+        if len(telephone) != 9:
+            raise ValueError("The telephone number needs to be 9 digits")
+        indicative = int(telephone[:2])
+        if indicative == 21 or indicative == 22:
+            return Utilities._get_city_by_indicative(int(telephone[:2]))
+        return Utilities._get_city_by_indicative(int(telephone[:3]))

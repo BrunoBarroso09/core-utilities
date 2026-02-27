@@ -13,6 +13,9 @@ dist/
 build/
 *.egg-info/
 
+#TODO
+todo.py
+
 # PyCharm / IntelliJ
 .idea/
 

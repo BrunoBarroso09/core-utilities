@@ -13,13 +13,15 @@ class Utilities:
         """Privacy: Transform email 'example@email.com' to 'e******@email.com'"""
         if not email or '@' not in email:
             return 'Invalid email'
-        user, domain = email.split('@',1)
-        domain, tld = domain.split('.',1)
+        user, domain = email.split('@', 1)
+        if '.' not in domain:
+            return 'Invalid email'
+        domain, tld = domain.split('.', 1)
         masked_user = user[0] + '*' * len(user[1:])
         masked_domain = domain[0] + '*' * len(domain[1:])
         return f"{masked_user}@{masked_domain}.{tld}"
 
-    @staticmethod #Validate if the current email is valid
+    @staticmethod
     def validate_email(email: str) -> bool:
         """Validate if the email format is valid"""
         if not email or '@' not in email:

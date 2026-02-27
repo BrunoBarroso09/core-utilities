@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "core-utilities"
+version = "0.1.0"
+description = "Centralized and robust service with utilities for the Python ecosystem"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+keywords = ["utilities", "portugal", "mask-email", "validate-email", "format-currency", "iban", "nif", "postal-code", "python"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "python-dotenv>=1.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/BrunoBarroso09/core-utilities"
+Repository = "https://github.com/BrunoBarroso09/core-utilities"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

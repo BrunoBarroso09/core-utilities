@@ -4,11 +4,9 @@ __pycache__/
 *$py.class
 
 # Python
-__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.env
 dist/
 build/
 *.egg-info/
@@ -22,7 +20,7 @@ todo.py
 # macOS
 .DS_Store
 
-./idea
+
 # C extensions
 *.so
 

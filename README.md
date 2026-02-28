@@ -40,9 +40,9 @@ print(Utilities.get_city_by_telephone("217676778")) # return Lisboa
 
 ## 🧪 Running Tests
 
-Install dependencies:
+Install pytest:
 ```bash
-pip install -r requirements.txt
+pip install pytest
 ```
 
 Run all tests:

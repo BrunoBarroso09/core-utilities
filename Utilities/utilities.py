@@ -1,5 +1,7 @@
+import locale
 import os
 import re
+from email_validator import validate_email, EmailNotValidError
 from dotenv import load_dotenv
 from typing import Optional
 
@@ -20,13 +22,20 @@ class Utilities:
         Raises:
             ValueError: If the email format is invalid.
         """
-        if not email or '@' not in email or '.' not in email.split('@')[-1]:
-            raise ValueError("Invalid email")
-        user, domain = email.split('@', 1)
-        domain, tld = domain.split('.', 1)
-        masked_user = user[0] + '*' * len(user[1:])
-        masked_domain = domain[0] + '*' * len(domain[1:])
-        return f"{masked_user}@{masked_domain}.{tld}"
+        if not Utilities.validate_email(email):
+            raise ValueError(f"Invalid email format: {email}")
+
+        local, domain = email.rsplit('@', 1)
+        masked_local = local[0] + '*' * (len(local) -1)
+
+        dots = domain.rsplit('.', 1)
+        if len(dots) == 2:
+            domain_name, tld = dots
+            masked_domain = domain_name[0] + '*' * (len(domain_name) - 1)
+            return f"{masked_local}@{masked_domain}.{tld}"
+        else:
+            masked_domain = domain[0] + "*" * (len(domain) - 1)
+            return f"{masked_local}@{masked_domain}"
 
     @staticmethod
     def validate_email(email: str) -> bool:
@@ -38,10 +47,13 @@ class Utilities:
         Returns:
             True if the email format is valid, False otherwise.
         """
-        if not email or '@' not in email:
+        if not email or '@' not in isinstance(email, str):
             return False
-        regex = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-        return bool(re.fullmatch(regex, email))
+        try:
+            validate_email(email, check_deliverability=False)
+            return True
+        except EmailNotValidError:
+            return False
 
     @staticmethod
     def format_currency(value: float, symbol: str = '€') -> str:
@@ -58,7 +70,11 @@ class Utilities:
         """
         if not isinstance(value, (int, float)):
             raise ValueError("Value must be a number")
-        return f"{value:,.2f} {symbol}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+        if locale == 'pt_PT':
+            return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1) + f" {symbol}"
+        else:
+            return f"{value:,.2f} {symbol}"
 
     @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
@@ -105,9 +121,15 @@ class Utilities:
         Returns:
             True if the fiscal number is valid, False otherwise.
         """
-        if not fiscal_number.isdigit() or len(fiscal_number) != 9:
+        try:
+            if  isinstance(fiscal_number, str):
+                return False
+            if not fiscal_number.isdigit() or len(fiscal_number) != 9:
+                return False
+            control_digit = Utilities._validate_digit(fiscal_number[:8])
+            return fiscal_number[-1] == control_digit
+        except (ValueError, IndexError, AttributeError):
             return False
-        return fiscal_number[-1] == Utilities._validate_digit(fiscal_number[:8])
 
     @staticmethod
     def validate_postal_code(postal_code: str) -> bool:
@@ -150,18 +172,77 @@ class Utilities:
         Returns:
             True if the IBAN is valid, False otherwise.
         """
-        if not iban:
+        if not iban or not isinstance(iban, str):
             return False
+
         iban = iban.replace(" ", "")
-        if len(iban) != 25 or iban[:2] != "PT":
+
+        if len(iban) != 25 or not iban.startswith("PT"):
             return False
-        if not iban[2:].isdigit():
+
+        if not iban[2:4].isdigit():
+            return False
+
+        if not iban[4:].isalnum():
             return False
 
         return Utilities._calculate_mod97(iban) == 1
 
+        PHONE_INDICATIVES = {
+        241: "Abrantes",
+        235: "Arganil",
+        234: "Aveiro",
+        284: "Beja",
+        253: "Braga",
+        273: "Bragança",
+        262: "Caldas da Rainha",
+        272: "Castelo Branco",
+        286: "Castro Verde",
+        276: "Chaves",
+        239: "Coimbra",
+        275: "Covilhã",
+        268: "Estremoz",
+        266: "Évora",
+        289: "Faro",
+        233: "Figueira da Foz",
+        271: "Guarda",
+        277: "Idanha-a-nova",
+        244: "Leiria",
+        21: "Lisboa",
+        231: "Mealhada",
+        278: "Mirandela",
+        279: "Moncorvo",
+        285: "Moura",
+        283: "Odemira",
+        255: "Penafiel",
+        254: "Peso da Régua",
+        236: "Pombal",
+        242: "Ponte de Sôr",
+        245: "Portalegre",
+        282: "Portimão",
+        22: "Porto",
+        274: "Proença-a-nova",
+        243: "Santarém",
+        269: "Santiago do Cacém",
+        256: "São João da Madeira",
+        238: "Seia",
+        265: "Setúbal",
+        281: "Tavira",
+        249: "Torres Novas",
+        261: "Torres Vedras",
+        251: "Valença",
+        258: "Viana do Castelo",
+        263: "Vila Franca de Xira",
+        252: "Vila Nova de Famalicão",
+        259: "Vila Real",
+        232: "Viseu",
+        291: "Funchal / Porto santo",
+        295: "Angra do Heroísmo / Graciosa / São Jorge",
+        292: "Corvo / Faial / Flores / Horta / Pico",
+        296: "Ponta Delgada / São Miguel / Santa Maria",
+    }
     @staticmethod
-    def _get_city_by_indicative(indicative: int) -> str:
+    def _get_city_by_indicative(self, indicative: int) -> str:
         """
         Return the city based on the indicative value.
 
@@ -172,129 +253,43 @@ class Utilities:
         Raises:
             ValueError: If the indicative value is not valid.
         """
-        match indicative:
-            case 241:
-                return "Abrantes"
-            case 235:
-                return "Arganil"
-            case 234:
-                return "Aveiro"
-            case 284:
-                return "Beja"
-            case 253:
-                return "Braga"
-            case 273:
-                return "Bragança"
-            case 262:
-                return "Caldas da Rainha"
-            case 272:
-                return "Castelo Branco"
-            case 286:
-                return "Castro Verde"
-            case 276:
-                return "Chaves"
-            case 239:
-                return "Coimbra"
-            case 275:
-                return "Covilhã"
-            case 268:
-                return "Estremoz"
-            case 266:
-                return "Évora"
-            case 289:
-                return "Faro"
-            case 233:
-                return "Figueira da Foz"
-            case 271:
-                return "Guarda"
-            case 277:
-                return "Idanha-a-nova"
-            case 244:
-                return "Leiria"
-            case 21:
-                return "Lisboa"
-            case 231:
-                return "Mealhada"
-            case 278:
-                return "Mirandela"
-            case 279:
-                return "Moncorvo"
-            case 285:
-                return "Moura"
-            case 283:
-                return "Odemira"
-            case 255:
-                return "Penafiel"
-            case 254:
-                return "Peso da Régua"
-            case 236:
-                return "Pombal"
-            case 242:
-                return "Ponte de Sôr"
-            case 245:
-                return "Portalegre"
-            case 282:
-                return "Portimão"
-            case 22:
-                return "Porto"
-            case 274:
-                return "Proença-a-nova"
-            case 243:
-                return "Santarém"
-            case 269:
-                return "Santiago do Cacém"
-            case 256:
-                return "São João da Madeira"
-            case 238:
-                return "Seia"
-            case 265:
-                return "Setúbal"
-            case 281:
-                return "Tavira"
-            case 249:
-                return "Torres Novas"
-            case 261:
-                return "Torres Vedras"
-            case 251:
-                return "Valença"
-            case 258:
-                return "Viana do Castelo"
-            case 263:
-                return "Vila Franca de Xira"
-            case 252:
-                return "Vila Nova de Famalicão"
-            case 259:
-                return "Vila Real"
-            case 232:
-                return "Viseu"
-            case 291:
-                return "Funchal / Porto santo"
-            case 295:
-                return "Angra do Heroísmo / Graciosa / São Jorge"
-            case 292:
-                return "Corvo / Faial / Flores / Horta / Pico"
-            case 296:
-                return "Ponta Delgada / São Miguel / Santa Maria"
-            case _:
-                raise ValueError("Invalid indicative")
+        if indicative not in self.PHONE_INDICATIVES:
+            raise ValueError(f"Unknown indicative: {indicative}. Valid range: {sorted(self.PHONE_INDICATIVES.keys())}")
+        return self.PHONE_INDICATIVES[indicative]
 
     @staticmethod
     def get_city_by_telephone(telephone: str) -> str:
         """
-        Returns the city associated with the telephone prefix
+        Returns the city associated with the telephone prefix.
+
+        Portuguese telephone format:
+        - 2-digit prefix: Lisboa (21), Porto (22)
+        - 3-digit prefix: All other cities
 
         Args:
-            telephone (str): Telephone number
+            telephone: 9-digit telephone number
+
         Returns:
-            str: City associated with prefix
+            City name
+
         Raises:
-            ValueError: Invalid telephone number
+            ValueError: Invalid telephone format
         """
-        if not telephone:
-            raise ValueError("Invalid telephone number")
+        if not telephone or not isinstance(telephone, str):
+            raise ValueError("Telephone must be a non-empty string")
         if len(telephone) != 9:
-            raise ValueError("The telephone number needs to be 9 digits")
-        indicative = int(telephone[:2])
-        if indicative == 21 or indicative == 22:
-            return Utilities._get_city_by_indicative(int(telephone[:2]))
-        return Utilities._get_city_by_indicative(int(telephone[:3]))
+            raise ValueError(f"Telephone must have 9 digits, got {len(telephone)}")
+        if not telephone.isdigit():
+            raise ValueError("Telephone must contain only digits")
+
+        two_digit = int(telephone[:2])
+        print(two_digit)
+        if two_digit in (21, 22):
+                return Utilities._get_city_by_indicative(two_digit)
+
+        # 3-digit indicatives (resto do país)
+        three_digit = int(telephone[:3])
+        return Utilities._get_city_by_indicative(three_digit)
+
+u = Utilities()
+print(u.get_city_by_telephone("278968770"))

@@ -1,9 +1,9 @@
-import locale
 import os
 import re
-from email_validator import validate_email, EmailNotValidError
+from babel.numbers import format_currency
 from dotenv import load_dotenv
 from typing import Optional
+
 
 #load_env outside the class because here load one time only
 load_dotenv()
@@ -22,59 +22,54 @@ class Utilities:
         Raises:
             ValueError: If the email format is invalid.
         """
-        if not Utilities.validate_email(email):
-            raise ValueError(f"Invalid email format: {email}")
+        if not email or '@' not in email or '.' not in email:
+            raise ValueError(f"Invalid email: {email}")
 
         local, domain = email.rsplit('@', 1)
-        masked_local = local[0] + '*' * (len(local) -1)
 
-        dots = domain.rsplit('.', 1)
-        if len(dots) == 2:
-            domain_name, tld = dots
-            masked_domain = domain_name[0] + '*' * (len(domain_name) - 1)
-            return f"{masked_local}@{masked_domain}.{tld}"
+        if len(local) == 1:
+            masked_local = '*'
         else:
-            masked_domain = domain[0] + "*" * (len(domain) - 1)
-            return f"{masked_local}@{masked_domain}"
+            masked_local = local[0] + '*' * (len(local) - 1)
 
+        domain_name, tld = domain.rsplit('.', 1)
+
+        if len(domain_name) == 1:
+            masked_domain = '*'
+        else:
+            masked_domain = domain_name[0] + '*' * (len(domain_name) - 1)
+
+        return f"{masked_local}@{masked_domain}.{tld}"
+
+    _EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+)
     @staticmethod
     def validate_email(email: str) -> bool:
         """
         Validate if the email format is valid
-        
+
         Args:
             email: The email address to validate.
         Returns:
             True if the email format is valid, False otherwise.
         """
-        if not email or '@' not in isinstance(email, str):
+        if not isinstance(email, str):
             return False
-        try:
-            validate_email(email, check_deliverability=False)
-            return True
-        except EmailNotValidError:
+
+        if not email or '@' not in email:
             return False
+
+        email = email.strip()
+
+        return bool(Utilities._EMAIL_REGEX.search(email))
 
     @staticmethod
-    def format_currency(value: float, symbol: str = '€') -> str:
-        """
-        Transform a number into a readable currency format
+    def format_currency(value: float) -> str:
 
-        Args:
-            value: The value to format.
-            symbol: The symbol to use.
-        Returns:
-            The formatted value.
-        Raises:
-            ValueError: If the value is not valid.
-        """
         if not isinstance(value, (int, float)):
-            raise ValueError("Value must be a number")
+            raise ValueError("Invalid value")
 
-        if locale == 'pt_PT':
-            return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1) + f" {symbol}"
-        else:
-            return f"{value:,.2f} {symbol}"
+        return format_currency(value, 'EUR')
 
     @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
@@ -87,10 +82,18 @@ class Utilities:
         Returns:
             Environment variable value.
         """
-        return os.getenv(key, default)
+        if not key or isinstance(key, str):
+            raise ValueError("Key must be non-empty string")
+
+        key = key.strip()
+        value = os.getenv(key)
+        if value == default:
+            return f"Environment variable '{key}' not found, using default"
+        else:
+            return value
 
     @staticmethod
-    def _validate_digit(digit: str) -> str:
+    def _calculate_check_digit(digit: str) -> str:
         """
         Private method to validate control digit for Portuguese fiscal number
 
@@ -121,30 +124,33 @@ class Utilities:
         Returns:
             True if the fiscal number is valid, False otherwise.
         """
+        if not isinstance(fiscal_number, str) or not fiscal_number.isdigit() or len(fiscal_number) != 9:
+            return False
+
+        fiscal_number = fiscal_number.strip()
+
         try:
-            if  isinstance(fiscal_number, str):
-                return False
-            if not fiscal_number.isdigit() or len(fiscal_number) != 9:
-                return False
-            control_digit = Utilities._validate_digit(fiscal_number[:8])
-            return fiscal_number[-1] == control_digit
+            expected_digit = Utilities._calculate_check_digit(fiscal_number[:8])
+            return fiscal_number[-1] == expected_digit
         except (ValueError, IndexError, AttributeError):
             return False
 
+    _CP_REGEX = re.compile(r'\d{4}-\d{3}$')
     @staticmethod
     def validate_postal_code(postal_code: str) -> bool:
         """
         Validate if the Portuguese postal code is valid
 
         Args:
-            postal_code: The postal code to validate.
+            postal_code: The postal code to validate. EX: 1100-001
         Returns:
             True if the postal code is valid, False otherwise.
         """
-        if not postal_code:
+        if not postal_code or not isinstance(postal_code, str):
             return False
-        regex_cp = r"\d{4}-\d{3}"
-        return bool(re.fullmatch(regex_cp, postal_code))
+
+        postal_code = postal_code.strip()
+        return bool(Utilities._CP_REGEX.match(postal_code))
 
     @staticmethod
     def _calculate_mod97(iban: str) -> int:
@@ -155,7 +161,15 @@ class Utilities:
             iban: The IBAN to calculate the mod97 for.
         Returns:
             The mod97 calculated for the IBAN.
+
+        Algorithm:
+            1. Move first 4 chars to end
+            2. Replace letters: P=25, T=29
+            3. Calculate mod 97 (valid = 1)
         """
+
+        if not iban or not isinstance(iban, str) or len(iban) < 4:
+            raise ValueError(f"Invalid IBAN")
         code = iban[:4]
         digits = iban[4:]
         replace_code = code.replace("P", "25").replace("T", "29")
@@ -175,7 +189,7 @@ class Utilities:
         if not iban or not isinstance(iban, str):
             return False
 
-        iban = iban.replace(" ", "")
+        iban = iban.strip().replace(" ", "")
 
         if len(iban) != 25 or not iban.startswith("PT"):
             return False
@@ -183,12 +197,17 @@ class Utilities:
         if not iban[2:4].isdigit():
             return False
 
-        if not iban[4:].isalnum():
+        if not iban[4:].isdigit():
             return False
 
-        return Utilities._calculate_mod97(iban) == 1
+        iban = iban.strip()
+        try:
+            mod97_result = Utilities._calculate_mod97(iban)
+            return mod97_result == 1
+        except ValueError:
+            return False
 
-        PHONE_INDICATIVES = {
+    PHONE_INDICATIVES = {
         241: "Abrantes",
         235: "Arganil",
         234: "Aveiro",
@@ -242,7 +261,7 @@ class Utilities:
         296: "Ponta Delgada / São Miguel / Santa Maria",
     }
     @staticmethod
-    def _get_city_by_indicative(self, indicative: int) -> str:
+    def _get_city_by_indicative(indicative: int) -> str:
         """
         Return the city based on the indicative value.
 
@@ -253,9 +272,13 @@ class Utilities:
         Raises:
             ValueError: If the indicative value is not valid.
         """
-        if indicative not in self.PHONE_INDICATIVES:
-            raise ValueError(f"Unknown indicative: {indicative}. Valid range: {sorted(self.PHONE_INDICATIVES.keys())}")
-        return self.PHONE_INDICATIVES[indicative]
+        if not isinstance(indicative, int):
+            raise TypeError(f"Indicative must be integer")
+
+        if indicative not in Utilities.PHONE_INDICATIVES:
+            raise ValueError(f"Unknown indicative: {indicative}")
+
+        return Utilities.PHONE_INDICATIVES[indicative]
 
     @staticmethod
     def get_city_by_telephone(telephone: str) -> str:
@@ -268,28 +291,27 @@ class Utilities:
 
         Args:
             telephone: 9-digit telephone number
-
         Returns:
             City name
-
         Raises:
             ValueError: Invalid telephone format
         """
-        if not telephone or not isinstance(telephone, str):
-            raise ValueError("Telephone must be a non-empty string")
+        if not isinstance(telephone, str):
+            raise TypeError(f"Telephone must be string")
+
+        telephone = telephone.strip()
+
         if len(telephone) != 9:
-            raise ValueError(f"Telephone must have 9 digits, got {len(telephone)}")
+            return f"Telephone must have 9 digits, got {len(telephone)}"
+
         if not telephone.isdigit():
-            raise ValueError("Telephone must contain only digits")
+            return "Telephone must contain only digits"
 
+        telephone = telephone.strip()
         two_digit = int(telephone[:2])
-        print(two_digit)
-        if two_digit in (21, 22):
-                return Utilities._get_city_by_indicative(two_digit)
 
-        # 3-digit indicatives (resto do país)
+        if two_digit in (21, 22):
+            return Utilities._get_city_by_indicative(two_digit)
+
         three_digit = int(telephone[:3])
         return Utilities._get_city_by_indicative(three_digit)
-
-u = Utilities()
-print(u.get_city_by_telephone("278968770"))

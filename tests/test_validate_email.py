@@ -1,17 +1,40 @@
 from Utilities import Utilities
+import pytest
 
-def test_validate_email_is_bool():
-    result = Utilities.validate_email("example.com")
-    assert isinstance(result, bool)
+class TestValidateEmail:
+    """Test suite for validate_email() method"""
 
-def test_validate_email_is_valid():
-    result = Utilities.validate_email("example@company.co.uk")
-    assert result
+    def test_validate_email_is_bool(self):
+        """Test that test_validate returns boolean value."""
+        result = Utilities.validate_email("example@gmail.com")
+        assert isinstance(result, bool)
 
-def test_validate_email_is_invalid():
-    result = Utilities.validate_email("example@comp")
-    assert not result
+    def test_validate_email_valid(self):
+        """Test that test_validate returns if email is valid."""
+        result = Utilities.validate_email("example@gmail.com")
+        assert result is True
 
-def test_validate_email_is_empty():
-    result = Utilities.validate_email("")
-    assert not result
+    def test_validate_email_invalid(self):
+        """Test that test_validate returns if email is invalid."""
+        result = Utilities.validate_email("example@gm")
+        assert result is False
+
+    def test_validate_email_empty(self):
+        """Test that test_validate returns if email is empty."""
+        with pytest.raises(ValueError):
+            Utilities.validate_email("")
+
+    def test_validate_email_subdomain(self):
+        """Test that test_validate returns if the subdomain is valid."""
+        result = Utilities.validate_email("example@company.co.uk")
+        assert result is True
+
+    def test_invalid_type_int(self):
+        """Test that test_validate returns error if integer is passed."""
+        with pytest.raises(TypeError):
+            Utilities.validate_email(123456)
+
+    def test_invalid_type_none(self):
+        """Test that test_validate returns error if none is passed."""
+        with pytest.raises(TypeError):
+            Utilities.validate_email(None)

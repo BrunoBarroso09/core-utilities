@@ -1,6 +1,6 @@
 import os
 import re
-from babel.numbers import format_currency
+import math
 from dotenv import load_dotenv
 from typing import Optional
 
@@ -41,8 +41,7 @@ class Utilities:
 
         return f"{masked_local}@{masked_domain}.{tld}"
 
-    _EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-)
+    _EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
     @staticmethod
     def validate_email(email: str) -> bool:
         """
@@ -53,11 +52,11 @@ class Utilities:
         Returns:
             True if the email format is valid, False otherwise.
         """
-        if not isinstance(email, str):
-            return False
+        if not isinstance(email, str) :
+            raise TypeError(f"Invalid email: {email}")
 
         if not email or '@' not in email:
-            return False
+            raise ValueError(f"Invalid email: {email}")
 
         email = email.strip()
 
@@ -65,11 +64,27 @@ class Utilities:
 
     @staticmethod
     def format_currency(value: float) -> str:
-
         if not isinstance(value, (int, float)):
             raise ValueError("Invalid value")
 
-        return format_currency(value, 'EUR')
+        if math.isnan(value) or math.isinf(value):
+            raise ValueError(f"Invalid value: {value}")
+
+        formatted = f"{value:.2f}"
+        integer_part, decimal_part = formatted.split('.')
+
+        is_negative = integer_part.startswith('-')
+        if is_negative:
+            integer_part = integer_part[1:]
+
+        integer_formatted = f"{int(integer_part):,}".replace(',', '.')
+
+        result = f"{integer_formatted},{decimal_part} €"
+
+        if is_negative:
+            result = f"-{result}"
+
+        return result
 
     @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
@@ -82,15 +97,16 @@ class Utilities:
         Returns:
             Environment variable value.
         """
-        if not key or isinstance(key, str):
+        if not isinstance(key, str):
+            raise TypeError(f"Key must be string, got {type(key).__name__}")
+
+        if not key or not key.strip():
             raise ValueError("Key must be non-empty string")
 
         key = key.strip()
-        value = os.getenv(key)
-        if value == default:
-            return f"Environment variable '{key}' not found, using default"
-        else:
-            return value
+        value = os.getenv(key, default)
+
+        return value
 
     @staticmethod
     def _calculate_check_digit(digit: str) -> str:
@@ -302,16 +318,18 @@ class Utilities:
         telephone = telephone.strip()
 
         if len(telephone) != 9:
-            return f"Telephone must have 9 digits, got {len(telephone)}"
+            raise TypeError(f"Telephone must have 9 digits, got {len(telephone)}")
 
         if not telephone.isdigit():
-            return "Telephone must contain only digits"
+            raise TypeError("Telephone must contain only digits")
 
         telephone = telephone.strip()
         two_digit = int(telephone[:2])
+        three_digit = int(telephone[:3])
 
         if two_digit in (21, 22):
             return Utilities._get_city_by_indicative(two_digit)
-
-        three_digit = int(telephone[:3])
-        return Utilities._get_city_by_indicative(three_digit)
+        elif three_digit in Utilities.PHONE_INDICATIVES:
+            return Utilities._get_city_by_indicative(three_digit)
+        else:
+            raise ValueError("Invalid telephone indicative")

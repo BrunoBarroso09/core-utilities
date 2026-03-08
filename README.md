@@ -1,5 +1,9 @@
 # Core Utilities 🚀
 
+![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![Tests](https://img.shields.io/badge/tests-69%2F69%20passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 This component provides essential static methods to simplify repetitive tasks like hide email, validate Portuguese fiscal number, validate Portuguese postal code and other.
 
 ## ✨ Functionalities
@@ -52,16 +56,15 @@ pytest tests/
 
 Expected output:
 ```
-tests/test_env.py .....                                                                                                                                                                                                          [ 13%]
-tests/test_format_currency.py ....                                                                                                                                                                                               [ 25%]
-tests/test_get_city_by_telephone.py ......                                                                                                                                                                                       [ 41%]
-tests/test_mask_email.py .....                                                                                                                                                                                                   [ 55%]
-tests/test_validate_email.py ....                                                                                                                                                                                                [ 66%]
-tests/test_validate_fiscal_number.py ....                                                                                                                                                                                        [ 77%]
-tests/test_validate_iban.py ....                                                                                                                                                                                                 [ 88%]
-tests/test_validate_postal_code.py ....                                                                                                                                                                                          [100%]
-
-========================================================================================================== 36 passed in 0.06s ==========================================================================================================
+tests/test_env.py ........                                                                                                                                                                                                       [ 11%]
+tests/test_format_currency.py ......                                                                                                                                                                                             [ 20%]
+tests/test_get_city_by_telephone.py ...........                                                                                                                                                                                  [ 36%]
+tests/test_mask_email.py .......                                                                                                                                                                                                 [ 46%]
+tests/test_validate_email.py .......                                                                                                                                                                                             [ 56%]
+tests/test_validate_fiscal_number.py ..........                                                                                                                                                                                  [ 71%]
+tests/test_validate_iban.py ..........                                                                                                                                                                                           [ 85%]
+tests/test_validate_postal_code.py ..........                                                                                                                                                                                    [100%]
+========================================================================================================== 69 passed in 0.04s ==========================================================================================================
 ```
 
 ### Test coverage

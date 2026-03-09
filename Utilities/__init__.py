@@ -1,9 +1,14 @@
-from .utilities import Utilities
+from .currency import format_currency
+from .env import get_env
+from .validators import mask_email, validate_email, validate_fiscal_number, validate_iban, validate_postal_code, validate_telephone_number
 
-mask_email = Utilities.mask_email
-validate_email = Utilities.validate_email
-format_currency = Utilities.format_currency
-get_env = Utilities.get_env
-validate_fiscal_number = Utilities.validate_fiscal_number
-validate_postal_code = Utilities.validate_postal_code
-validate_iban = Utilities.validate_iban
+__all__ = [
+    "format_currency",
+    "get_env",
+    "mask_email",
+    "validate_email",
+    "validate_fiscal_number",
+    "validate_iban",
+    "validate_postal_code",
+    "validate_telephone_number"
+]

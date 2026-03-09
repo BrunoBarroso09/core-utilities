@@ -24,22 +24,25 @@ Copy the `Utilities` folder to the root of your project:
 ```text
 your_project/
 ├── Utilities/
-│   ├── __init__.py
-│   └── utilities.py
+│   ├── currency/
+│   ├── env/
+│   └── validators/
 ```
 
 ### 2. Usage examples
 ```python
-from Utilities import Utilities
+from Utilities.validators import fiscal_number
+from Utilities.validators import postal_code
+from Utilities.validators import telephone
 
 # Validate Portuguese fiscal number
-print(Utilities.validate_fiscal_number("287148300"))    # return True
+print(fiscal_number.FiscalNumberUtilities.validate_fiscal_number("287148300"))    # return True
 
 # Validate Portuguese postal code
-print(Utilities.validate_postal_code("1231-323"))   # return True
+print(postal_code.PostalCodeUtilities.validate_postal_code("1231-323"))   # return True
 
 # Get city by telephone prefix
-print(Utilities.get_city_by_telephone("217676778")) # return Lisboa
+print(telephone.TelephonePrefixUtilities.get_city_by_telephone("217676778")) # return Lisboa
 ```
 
 ## 🧪 Running Tests
@@ -84,8 +87,9 @@ tests/test_validate_postal_code.py ..........                                   
 ```text
 core-utilities/
 ├── Utilities/
-│   ├── __init__.py
-│   └── utilities.py
+│   ├── currency/
+│   ├── env/
+│   └── validators/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_env.py

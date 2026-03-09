@@ -1,29 +1,29 @@
 import pytest
-from Utilities.env import enviroment
+from Utilities.enviroment import environment
 
 class TestEnv:
-    """Test suite for env() method"""
+    """Test suite for enviroment() method"""
 
     def test_env_is_valid(self, monkeypatch):
-        """Test env returns correct value."""
+        """Test enviroment returns correct value."""
         monkeypatch.setenv("DATABASE_URL", "test_database_url")
         assert enviroment.EnvUtilities.get_env("DATABASE_URL") == "test_database_url"
 
     def test_env_default_value(self, monkeypatch):
-        """Test env returns default value."""
+        """Test enviroment returns default value."""
         assert enviroment.EnvUtilities.get_env("NON_EXISTENT", "default") == "default"
 
     def test_env_default_none(self, monkeypatch):
-        """Test env returns default is None."""
+        """Test enviroment returns default is None."""
         assert enviroment.EnvUtilities.get_env("NON_EXISTENT") is None
 
     def test_env_is_empty(self, monkeypatch):
-        """Test env returns empty string."""
+        """Test enviroment returns empty string."""
         monkeypatch.setenv("EMPTY_VAR", "")
         assert enviroment.EnvUtilities.get_env("EMPTY_VAR") == ""
 
     def test_env_overwrite(self, monkeypatch):
-        """Test env overwrites default value."""
+        """Test enviroment overwrites default value."""
         monkeypatch.setenv("DATABASE_URL", "old_value")
         monkeypatch.setenv("DATABASE_URL", "new_value")
         assert enviroment.EnvUtilities.get_env("DATABASE_URL") == "new_value"

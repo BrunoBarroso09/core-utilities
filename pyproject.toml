@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "core-pt-utilities"
-version = "0.1.1"
+version = "0.1.2"
 description = "Centralized and robust service with utilities for the Python ecosystem"
 readme = "README.md"
 license = { file = "LICENSE" }

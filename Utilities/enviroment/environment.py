@@ -10,7 +10,7 @@ class EnvUtilities:
     @staticmethod
     def get_env(key: str, default: Optional[str] = None) -> Optional[str]:
         """
-        Read environment variable from .enviroment file
+        Read environment variable from .environment file
 
         Args:
             key: Environment variable to read.

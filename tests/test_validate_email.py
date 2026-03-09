@@ -1,4 +1,4 @@
-from Utilities import Utilities
+from Utilities.validators import email
 import pytest
 
 class TestValidateEmail:
@@ -6,35 +6,35 @@ class TestValidateEmail:
 
     def test_validate_email_is_bool(self):
         """Test that test_validate returns boolean value."""
-        result = Utilities.validate_email("example@gmail.com")
+        result = email.EmailUtilities.validate_email("example@gmail.com")
         assert isinstance(result, bool)
 
     def test_validate_email_valid(self):
         """Test that test_validate returns if email is valid."""
-        result = Utilities.validate_email("example@gmail.com")
+        result = email.EmailUtilities.validate_email("example@gmail.com")
         assert result is True
 
     def test_validate_email_invalid(self):
         """Test that test_validate returns if email is invalid."""
-        result = Utilities.validate_email("example@gm")
+        result = email.EmailUtilities.validate_email("example@gm")
         assert result is False
 
     def test_validate_email_empty(self):
         """Test that test_validate returns if email is empty."""
         with pytest.raises(ValueError):
-            Utilities.validate_email("")
+            email.EmailUtilities.validate_email("")
 
     def test_validate_email_subdomain(self):
         """Test that test_validate returns if the subdomain is valid."""
-        result = Utilities.validate_email("example@company.co.uk")
+        result = email.EmailUtilities.validate_email("example@company.co.uk")
         assert result is True
 
     def test_invalid_type_int(self):
         """Test that test_validate returns error if integer is passed."""
         with pytest.raises(TypeError):
-            Utilities.validate_email(123456)
+            email.EmailUtilities.validate_email(123456)
 
     def test_invalid_type_none(self):
         """Test that test_validate returns error if none is passed."""
         with pytest.raises(TypeError):
-            Utilities.validate_email(None)
+            email.EmailUtilities.validate_email(None)

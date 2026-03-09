@@ -9,4 +9,4 @@ validate_email = EmailUtilities.validate_email
 validate_fiscal_number = FiscalNumberUtilities.validate_fiscal_number
 validate_iban = IBANUtilities.validate_iban
 validate_postal_code = PostalCodeUtilities.validate_postal_code
-validate_telephone_number = TelephonePrefixUtilities.get_city_by_telephone()
+validate_telephone_number = TelephonePrefixUtilities.get_city_by_telephone

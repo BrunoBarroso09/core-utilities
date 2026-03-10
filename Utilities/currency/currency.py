@@ -4,6 +4,16 @@ class CurrencyUtilities:
 
     @staticmethod
     def format_currency(value: float) -> str:
+        """
+        Transform a number into a readable currency format
+
+        Args:
+            value: The value to format.
+        Returns:
+            The formatted value.
+        Raises:
+            ValueError: If the value is not valid.
+        """
         if not isinstance(value, (int, float)):
             raise ValueError("Invalid value")
 
